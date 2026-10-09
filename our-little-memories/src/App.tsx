@@ -22,29 +22,27 @@ async function signedUrls(paths: string[]) {
   return out
 }
 
-function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+const ALBUM_EMAIL = 'dillahsajaya@gmail.com'
+const ALBUM_PASSWORD = 'qd6gilwaxIfcBEgqXo'
+
+function Cover() {
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
-  async function submit(e: React.FormEvent) {
-    e.preventDefault()
+  async function openAlbum() {
     if (busy) return
     setBusy(true); setErr('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setErr('Email atau password salah.')
+    const { error } = await supabase.auth.signInWithPassword({ email: ALBUM_EMAIL, password: ALBUM_PASSWORD })
+    if (error) setErr('Album belum bisa dibuka. Coba lagi sebentar ya.')
     setBusy(false)
   }
   return (
     <div className="center">
-      <form className="paper login" onSubmit={submit}>
+      <div className="paper login">
         <h1>OUR LITTLE<br />MEMORIES ♡</h1>
         <p className="hand">A collection of moments worth remembering.</p>
-        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
         {err && <p className="err">{err}</p>}
-        <button className="btn primary" disabled={busy}>{busy ? 'Masuk…' : 'OPEN OUR ALBUM'}</button>
-      </form>
+        <button className="btn primary" onClick={openAlbum} disabled={busy}>{busy ? 'Membuka…' : 'OPEN OUR ALBUM'}</button>
+      </div>
     </div>
   )
 }
@@ -274,7 +272,6 @@ function AlbumView({ session }: { session: Session }) {
         <div className="hdr">
           <span className={`pill ${conn}`}>{CONN_LABEL[conn]}</span>
           <button className="btn" onClick={() => { setEdit(!edit); setAdding(false) }}>{edit ? 'DONE' : 'EDIT ALBUM'}</button>
-          <button className="btn" onClick={() => supabase.auth.signOut()}>Keluar</button>
         </div>
       </header>
 
@@ -362,5 +359,5 @@ export default function App() {
   }, [])
   if (!configured) return <p className="center">Kunci Supabase belum diisi (lihat README, bagian Environment Variables).</p>
   if (session === undefined) return <p className="center">Loading…</p>
-  return session ? <AlbumView key={session.user.id} session={session} /> : <Login />
+  return session ? <AlbumView key={session.user.id} session={session} /> : <Cover />
 }
